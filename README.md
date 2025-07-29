@@ -31,4 +31,17 @@ This lab provides a step‑by‑step guide to install **Java 21**, **Maven 3.9.1
 ```bash
 cat /etc/os-release
 
+---
+
 ## ☕ Step 2: Install Java 21
+For Ubuntu/Debian
+```bash
+sudo apt update
+sudo apt install -y openjdk-21-jdk wget tar git
+For CentOS/RHEL/Rocky/AlmaLinux
+```bash
+sudo dnf install -y java-21-openjdk-devel wget tar git
+✅ Verify installation:
+
+```bash
+java -version
