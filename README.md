@@ -19,3 +19,16 @@ This lab provides a step‑by‑step guide to install **Java 21**, **Maven 3.9.1
 - [🎯 Final Result](#-final-result)
 - [🧹 Cleanup (Optional)](#-cleanup-optional)
 
+## 📌 Prerequisites
+- Linux system (Ubuntu, Debian, CentOS, Rocky, AlmaLinux)
+- `sudo` privileges
+- Internet access
+
+---
+
+## 📝 Step 1: Detect Linux Distribution
+
+```bash
+cat /etc/os-release
+
+## ☕ Step 2: Install Java 21
