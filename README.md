@@ -1,12 +1,10 @@
-
-
-# Java, Maven \& Tomcat Setup and Sample Deployment Guide
+# Java, Maven & Tomcat Setup and Sample Deployment Guide
 
 This README provides **step-by-step instructions** to set up Java OpenJDK 21, Apache Maven, and Apache Tomcat 10, and to create and deploy a sample Maven web application.
 
 ## 1. Install Java OpenJDK 21
 
-**a. Detect your Linux distribution (Ubuntu/Debian or CentOS/RHEL/Rocky/AlmaLinux):**
+### a. Detect your Linux distribution (Ubuntu/Debian or CentOS/RHEL/Rocky/AlmaLinux):
 
 Open a terminal and run:
 
@@ -20,7 +18,7 @@ else
 fi
 ```
 
-**b. Install Java and basic tools:**
+### b. Install Java and basic tools:
 
 - **For Ubuntu/Debian:**
 
@@ -35,15 +33,14 @@ sudo apt install -y openjdk-21-jdk wget tar git
 sudo dnf install -y java-21-openjdk-devel wget tar git
 ```
 
-
-**c. Set `JAVA_HOME`:**
+### c. Set `JAVA_HOME`:
 
 ```bash
 JAVA_HOME_PATH=$(dirname $(dirname $(readlink -f $(which javac))))
 echo "JAVA_HOME detected at: $JAVA_HOME_PATH"
 ```
 
-**d. Persist Java settings (add to `~/.bash_profile`):**
+### d. Persist Java settings (add to `~/.bash_profile`):
 
 ```bash
 echo "export JAVA_HOME=$JAVA_HOME_PATH" >> ~/.bash_profile
@@ -53,16 +50,15 @@ export JAVA_HOME=$JAVA_HOME_PATH
 export PATH=$JAVA_HOME/bin:$PATH
 ```
 
-**e. Test your Java installation:**
+### e. Test your Java installation:
 
 ```bash
 java -version
 ```
 
-
 ## 2. Install Maven 3.9.11
 
-**a. Download and extract Maven:**
+### a. Download and extract Maven:
 
 ```bash
 cd /tmp
@@ -71,7 +67,7 @@ sudo mkdir -p /opt/maven
 sudo tar xf apache-maven-3.9.11-bin.tar.gz -C /opt/maven --strip-components=1
 ```
 
-**b. Set Maven environment:**
+### b. Set Maven environment:
 
 ```bash
 echo 'export M2_HOME=/opt/maven' >> ~/.bash_profile
@@ -80,191 +76,170 @@ export M2_HOME=/opt/maven
 export PATH=$M2_HOME/bin:$PATH
 ```
 
-**c. Verify Maven installation:**
+### c. Verify Maven installation:
 
 ```bash
-mvn --version
+mvn -version
 ```
 
+## 3. Install Apache Tomcat 10
 
-## 3. Install Apache Tomcat 10.1.43
-
-**a. Create tomcat system user (if doesn't exist):**
-
-```bash
-if ! id -u tomcat >/dev/null 2>&1; then
-  sudo useradd -r -m -U -d /opt/tomcat -s /bin/false tomcat
-else
-  echo "User 'tomcat' already exists."
-fi
-```
-
-**b. Download and install Tomcat:**
+### a. Download and extract Tomcat:
 
 ```bash
 cd /tmp
-wget https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.43/bin/apache-tomcat-10.1.43.tar.gz
+wget https://downloads.apache.org/tomcat/tomcat-10/v10.1.30/bin/apache-tomcat-10.1.30.tar.gz
 sudo mkdir -p /opt/tomcat
-sudo tar xf apache-tomcat-10.1.43.tar.gz -C /opt/tomcat --strip-components=1
+sudo tar xf apache-tomcat-10.1.30.tar.gz -C /opt/tomcat --strip-components=1
 ```
 
-**c. Set permissions:**
+### b. Set Tomcat environment:
 
 ```bash
-sudo chown -R tomcat: /opt/tomcat
+echo 'export CATALINA_HOME=/opt/tomcat' >> ~/.bash_profile
+echo 'export PATH=$CATALINA_HOME/bin:$PATH' >> ~/.bash_profile
+export CATALINA_HOME=/opt/tomcat
+export PATH=$CATALINA_HOME/bin:$PATH
+```
+
+### c. Make Tomcat scripts executable:
+
+```bash
 sudo chmod +x /opt/tomcat/bin/*.sh
 ```
 
-**d. Create systemd service for Tomcat:**
+### d. Start Tomcat:
 
 ```bash
-sudo tee /etc/systemd/system/tomcat.service > /dev/null <<EOF
-[Unit]
-Description=Apache Tomcat Web Application Container
-After=network.target
-
-[Service]
-Type=forking
-User=tomcat
-Group=tomcat
-
-Environment="JAVA_HOME=${JAVA_HOME_PATH}"
-Environment="CATALINA_PID=/opt/tomcat/temp/tomcat.pid"
-Environment="CATALINA_HOME=/opt/tomcat"
-Environment="CATALINA_BASE=/opt/tomcat"
-
-ExecStart=/opt/tomcat/bin/startup.sh
-ExecStop=/opt/tomcat/bin/shutdown.sh
-Restart=on-failure
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-sudo systemctl daemon-reload
-sudo systemctl enable --now tomcat
-sleep 5
-sudo systemctl status tomcat --no-pager
+sudo /opt/tomcat/bin/startup.sh
 ```
 
+### e. Verify Tomcat installation:
 
-## 4. Create and Deploy a Sample Maven Web Application
+Open a web browser and navigate to `http://localhost:8080`. You should see the Tomcat welcome page.
 
-### a. Generate Maven webapp project
+## 4. Create a Sample Maven Web Application
+
+### a. Create a new Maven project:
 
 ```bash
-mkdir -p ~/maven-tomcat-demo
-cd ~/maven-tomcat-demo
-mvn archetype:generate \
- -DgroupId=com.example \
- -DartifactId=mywebapp \
- -DarchetypeArtifactId=maven-archetype-webapp \
- -DinteractiveMode=false
-cd mywebapp
+mkdir -p ~/projects
+cd ~/projects
+mvn archetype:generate -DgroupId=com.example -DartifactId=sample-webapp -DarchetypeArtifactId=maven-archetype-webapp -DinteractiveMode=false
+cd sample-webapp
 ```
 
+### b. Update the `pom.xml` file:
 
-### b. Replace the default `pom.xml` with the following:
+Edit `pom.xml` to ensure it uses the correct Java version and dependencies:
 
 ```xml
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  
   <groupId>com.example</groupId>
-  <artifactId>mywebapp</artifactId>
+  <artifactId>sample-webapp</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>war</packaging>
+  
+  <name>sample-webapp</name>
+  <url>http://www.example.com</url>
+  
+  <properties>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  
+  <dependencies>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <version>6.0.0</version>
+      <scope>provided</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  
   <build>
-    <finalName>${project.artifactId}##${project.version}</finalName>
+    <finalName>sample-webapp</finalName>
     <plugins>
       <plugin>
-        <groupId>org.apache.tomcat.maven</groupId>
-        <artifactId>tomcat7-maven-plugin</artifactId>
-        <version>2.2</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.11.0</version>
         <configuration>
-          <url>http://localhost:8080/manager/text</url>
-          <username>admin</username>
-          <password>adminadmin</password>
-          <path>/${project.artifactId}##${project.version}</path>
+          <source>21</source>
+          <target>21</target>
         </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>3.3.2</version>
       </plugin>
     </plugins>
   </build>
 </project>
 ```
 
-
-### c. Add a simple `index.jsp`:
-
-```bash
-mkdir -p src/main/webapp
-cat > src/main/webapp/index.jsp <<EOL
-<html>
-<body>
-<h2>Hello World from Maven Webapp on Tomcat!</h2>
-</body>
-</html>
-EOL
-```
-
-
-## 5. Configure Tomcat for Deployment
-
-**Edit `/opt/tomcat/conf/tomcat-users.xml` and add these lines inside `<tomcat-users>`:**
-
-```xml
-<role rolename="manager-script"/>
-<user username="admin" password="adminadmin" roles="manager-script"/>
-```
-
-**Restart Tomcat:**
-
-```bash
-sudo systemctl restart tomcat
-```
-
-
-## 6. Build and Deploy the Web Application
-
-**a. Build the WAR file:**
+### c. Build the web application:
 
 ```bash
 mvn clean package
 ```
 
-**b. Deploy the app to Tomcat:**
+## 5. Deploy the Application to Tomcat
+
+### a. Copy the WAR file to Tomcat's webapps directory:
 
 ```bash
-mvn tomcat7:deploy
+sudo cp target/sample-webapp.war /opt/tomcat/webapps/
 ```
 
+### b. Restart Tomcat:
 
-## 7. Access Your Application
-
-**Open the following URL in your browser:**
-
-```
-http://localhost:8080/mywebapp##1.0-SNAPSHOT
+```bash
+sudo /opt/tomcat/bin/shutdown.sh
+sudo /opt/tomcat/bin/startup.sh
 ```
 
-You should see:
-**Hello World from Maven Webapp on Tomcat!**
+### c. Test the deployment:
 
-## Troubleshooting
+Open a web browser and navigate to `http://localhost:8080/sample-webapp`. You should see your web application.
 
-- **Java/Maven not found?**
-Double-check the exported paths and restart your terminal session.
-- **Tomcat not starting?**
-Check `sudo systemctl status tomcat` for errors.
-- **Deployment fails?**
-Ensure the `admin` user with `manager-script` role is configured and Tomcat is restarted.
+## 6. Troubleshooting
 
+### Common Issues:
 
-## Notes
+- **Port 8080 already in use**: Check if another service is using port 8080 with `sudo netstat -tlnp | grep 8080`
+- **Permission denied**: Ensure Tomcat scripts are executable with `sudo chmod +x /opt/tomcat/bin/*.sh`
+- **JAVA_HOME not set**: Verify with `echo $JAVA_HOME` and ensure it's in your `~/.bash_profile`
+- **Maven not found**: Check PATH with `echo $PATH` and verify Maven installation
 
-- If you make changes to `pom.xml` or the source, **rebuild** with `mvn clean package` and **redeploy**.
-- Remember to secure your Tomcat server for production environments.
+### Logs:
 
-Enjoy learning Java web development!
+- **Tomcat logs**: `/opt/tomcat/logs/catalina.out`
+- **Application logs**: `/opt/tomcat/logs/localhost.YYYY-MM-DD.log`
 
+## 7. Next Steps
+
+- Configure Tomcat users in `/opt/tomcat/conf/tomcat-users.xml` for management access
+- Set up SSL/TLS for production environments
+- Configure database connections for your applications
+- Implement CI/CD pipelines for automated deployment
+
+---
+
+**Note**: This guide assumes a Linux environment. For Windows or macOS, adjust paths and commands accordingly.
