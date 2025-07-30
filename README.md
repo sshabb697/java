@@ -90,7 +90,7 @@ mvn -version
 cd /tmp
 wget https://downloads.apache.org/tomcat/tomcat-10/v10.1.43/bin/apache-tomcat-10.1.43.tar.gz
 sudo mkdir -p /opt/tomcat
-sudo tar xf apache-tomcat-10.1.30.tar.gz -C /opt/tomcat --strip-components=1
+sudo tar xf apache-tomcat-10.1.43.tar.gz -C /opt/tomcat --strip-components=1
 ```
 
 ### b. Set Tomcat environment:
