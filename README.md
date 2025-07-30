@@ -88,7 +88,7 @@ mvn -version
 
 ```bash
 cd /tmp
-wget https://downloads.apache.org/tomcat/tomcat-10/v10.1.30/bin/apache-tomcat-10.1.30.tar.gz
+wget https://downloads.apache.org/tomcat/tomcat-10/v10.1.43/bin/apache-tomcat-10.1.43.tar.gz
 sudo mkdir -p /opt/tomcat
 sudo tar xf apache-tomcat-10.1.30.tar.gz -C /opt/tomcat --strip-components=1
 ```
