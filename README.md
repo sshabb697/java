@@ -105,6 +105,7 @@ export PATH=$CATALINA_HOME/bin:$PATH
 ### c. Make Tomcat scripts executable:
 
 ```bash
+ sudo chmod 755 -R /opt/tomcat/
 sudo chmod +x /opt/tomcat/bin/*.sh
 ```
 
